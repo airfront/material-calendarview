@@ -189,6 +189,8 @@ public class MaterialCalendarView extends ViewGroup {
 
   private final ArrayList<DayViewDecorator> dayViewDecorators = new ArrayList<>();
 
+  private DayViewAdapter dayViewAdapter;
+
   private final OnClickListener onClickListener = new OnClickListener() {
     @Override
     public void onClick(View v) {
@@ -2006,5 +2008,15 @@ public class MaterialCalendarView extends ViewGroup {
   private static void enableView(final View view, final boolean enable) {
     view.setEnabled(enable);
     view.setAlpha(enable ? 1f : 0.1f);
+  }
+
+  public final void setDayViewAdapter(DayViewAdapter adapter) {
+    dayViewAdapter = adapter;
+  }
+
+  @NonNull
+  public final DayViewAdapter getDayViewAdapter() {
+    //noinspection Convert2Lambda
+    return dayViewAdapter == null ? DayViewAdapter.DEFAULT : dayViewAdapter;
   }
 }

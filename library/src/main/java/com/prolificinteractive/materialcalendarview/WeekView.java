@@ -21,7 +21,7 @@ import org.threeten.bp.LocalDate;
   }
 
   @Override protected void buildDayViews(
-      final Collection<DayView> dayViews,
+      final Collection<DayViewHolder> dayViews,
       final LocalDate calendar) {
     LocalDate temp = calendar;
     for (int i = 0; i < DEFAULT_DAYS_IN_WEEK; i++) {

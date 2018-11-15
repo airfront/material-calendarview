@@ -38,7 +38,7 @@ abstract class CalendarPagerView extends ViewGroup
   private CalendarDay maxDate = null;
   protected boolean showWeekDays;
 
-  private final Collection<DayView> dayViews = new ArrayList<>();
+  private final Collection<DayViewHolder> dayViews = new ArrayList<>();
 
   public CalendarPagerView(
       @NonNull MaterialCalendarView view,
@@ -74,12 +74,14 @@ abstract class CalendarPagerView extends ViewGroup
     }
   }
 
-  protected void addDayView(Collection<DayView> dayViews, LocalDate temp) {
+  protected void addDayView(Collection<DayViewHolder> dayViews, LocalDate temp) {
     CalendarDay day = CalendarDay.from(temp);
-    DayView dayView = new DayView(getContext(), day);
+    DayViewAdapter factory = mcv.getDayViewAdapter();
+    DayViewHolder dayViewHolder = factory.createDayView(getContext(), day);
+    View dayView = dayViewHolder.itemView;
     dayView.setOnClickListener(this);
     dayView.setOnLongClickListener(this);
-    dayViews.add(dayView);
+    dayViews.add(dayViewHolder);
     addView(dayView, new LayoutParams());
   }
 
@@ -100,7 +102,7 @@ abstract class CalendarPagerView extends ViewGroup
     return firstDayOfWeek;
   }
 
-  protected abstract void buildDayViews(Collection<DayView> dayViews, LocalDate calendar);
+  protected abstract void buildDayViews(Collection<DayViewHolder> dayViews, LocalDate calendar);
 
   protected abstract boolean isDayEnabled(CalendarDay day);
 
@@ -119,7 +121,7 @@ abstract class CalendarPagerView extends ViewGroup
   }
 
   public void setDateTextAppearance(int taId) {
-    for (DayView dayView : dayViews) {
+    for (DayViewHolder dayView : dayViews) {
       dayView.setTextAppearance(getContext(), taId);
     }
   }
@@ -130,14 +132,14 @@ abstract class CalendarPagerView extends ViewGroup
   }
 
   public void setSelectionEnabled(boolean selectionEnabled) {
-    for (DayView dayView : dayViews) {
+    for (DayViewHolder dayView : dayViews) {
       dayView.setOnClickListener(selectionEnabled ? this : null);
       dayView.setClickable(selectionEnabled);
     }
   }
 
   public void setSelectionColor(int color) {
-    for (DayView dayView : dayViews) {
+    for (DayViewHolder dayView : dayViews) {
       dayView.setSelectionColor(color);
     }
   }
@@ -149,13 +151,13 @@ abstract class CalendarPagerView extends ViewGroup
   }
 
   public void setDayFormatter(DayFormatter formatter) {
-    for (DayView dayView : dayViews) {
+    for (DayViewHolder dayView : dayViews) {
       dayView.setDayFormatter(formatter);
     }
   }
 
   public void setDayFormatterContentDescription(DayFormatter formatter) {
-    for (DayView dayView : dayViews) {
+    for (DayViewHolder dayView : dayViews) {
       dayView.setDayFormatterContentDescription(formatter);
     }
   }
@@ -171,7 +173,7 @@ abstract class CalendarPagerView extends ViewGroup
   }
 
   public void setSelectedDates(Collection<CalendarDay> dates) {
-    for (DayView dayView : dayViews) {
+    for (DayViewHolder dayView : dayViews) {
       CalendarDay day = dayView.getDate();
       dayView.setChecked(dates != null && dates.contains(day));
     }
@@ -179,7 +181,7 @@ abstract class CalendarPagerView extends ViewGroup
   }
 
   protected void updateUi() {
-    for (DayView dayView : dayViews) {
+    for (DayViewHolder dayView : dayViews) {
       CalendarDay day = dayView.getDate();
       dayView.setupSelection(showOtherDates, day.isInRange(minDate, maxDate), isDayEnabled(day));
     }
@@ -188,7 +190,7 @@ abstract class CalendarPagerView extends ViewGroup
 
   protected void invalidateDecorators() {
     final DayViewFacade facadeAccumulator = new DayViewFacade();
-    for (DayView dayView : dayViews) {
+    for (DayViewHolder dayView : dayViews) {
       facadeAccumulator.reset();
       for (DecoratorResult result : decoratorResults) {
         if (result.decorator.shouldDecorate(dayView.getDate())) {
