@@ -1,12 +1,19 @@
 <img src="/images/hero.png"/>
 
-# Material Calendar View 
+# Material Calendar View (MODIFIED)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Material%20Calendar%20View-blue.svg?style=flat)](https://android-arsenal.com/details/1/1531) [![](https://jitpack.io/v/prolificinteractive/material-calendarview.svg)](https://jitpack.io/#prolificinteractive/material-calendarview) [![Travis branch](https://img.shields.io/travis/prolificinteractive/material-calendarview.svg?maxAge=2592000)](https://travis-ci.org/prolificinteractive/material-calendarview)
 
 A Material design back port of Android's CalendarView. The goal is to have a Material look
 and feel, rather than 100% parity with the platform's implementation.
 
 <img src="/images/screencast.gif" alt="Demo Screen Capture" width="300px" />
+
+## Modifications of this fork.
+
+- added custom day view adapter feature.
+- added additional toolbar insertion feature.
+
+<!-- img src="/images/customized.png" alt="customized screen capture" width="300px" / -->
 
 ## Installation
 

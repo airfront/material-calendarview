@@ -56,10 +56,14 @@ public class BasicActivity extends AppCompatActivity
       public DayViewHolder createDayView(Context context, CalendarDay calendarDay) {
         return new DayViewHolder(View.inflate(context, R.layout.view_day, null), calendarDay) {
           private TextView label;
+          private TextView event1, event2, event3;
           @Override
           protected void onBind(View v, CalendarDay date) {
             label = v.findViewById(R.id.label);
             label.setText(String.format(Locale.US, "%d", calendarDay.getDay()));
+            event1 = v.findViewById(R.id.event1);
+            event2 = v.findViewById(R.id.event2);
+            event3 = v.findViewById(R.id.event3);
           }
 
           @Override

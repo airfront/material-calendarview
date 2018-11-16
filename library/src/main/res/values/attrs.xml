@@ -68,6 +68,8 @@
     </attr>
 
     <attr name="mcv_toolbarLayout" format="reference" />
+
+    <attr name="mcv_weekDaysHeight" format="dimension" />
   </declare-styleable>
 
 </resources>

@@ -240,6 +240,7 @@ public class MaterialCalendarView extends ViewGroup {
   private boolean allowClickDaysOutsideCurrentMonth = true;
   private DayOfWeek firstDayOfWeek;
   private boolean showWeekDays;
+  private int weekDaysHeight = 0;
 
   @LayoutRes
   private int toolbarLayout = 0;
@@ -312,6 +313,7 @@ public class MaterialCalendarView extends ViewGroup {
       }
 
       showWeekDays = a.getBoolean(R.styleable.MaterialCalendarView_mcv_showWeekDays, true);
+      weekDaysHeight = a.getDimensionPixelSize(R.styleable.MaterialCalendarView_mcv_weekDaysHeight, 0);
 
       newState()
           .setFirstDayOfWeek(firstDayOfWeek)
@@ -1561,7 +1563,7 @@ public class MaterialCalendarView extends ViewGroup {
 
     final int weekCount = getWeekCountBasedOnMode();
 
-    final int viewTileHeight = getTopbarVisible() ? (weekCount + 1) : weekCount;
+    final int viewTileHeight = weekCount + (getTopbarVisible() ? 1 : 0) + (toolbarLayout != 0 ? 1 : 0);
 
     //Calculate independent tile sizes for later
     int desiredTileWidth = desiredWidth / DEFAULT_DAYS_IN_WEEK;
@@ -2029,5 +2031,9 @@ public class MaterialCalendarView extends ViewGroup {
   public final DayViewAdapter getDayViewAdapter() {
     //noinspection Convert2Lambda
     return dayViewAdapter == null ? DayViewAdapter.DEFAULT : dayViewAdapter;
+  }
+
+  public final int getWeekDaysHeight() {
+    return weekDaysHeight;
   }
 }

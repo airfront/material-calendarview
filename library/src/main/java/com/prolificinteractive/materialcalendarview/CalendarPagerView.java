@@ -3,20 +3,24 @@ package com.prolificinteractive.materialcalendarview;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView.ShowOtherDates;
 import com.prolificinteractive.materialcalendarview.format.DayFormatter;
 import com.prolificinteractive.materialcalendarview.format.WeekDayFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+
 import org.threeten.bp.DayOfWeek;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.temporal.TemporalField;
 import org.threeten.bp.temporal.WeekFields;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.SHOW_DEFAULTS;
 import static com.prolificinteractive.materialcalendarview.MaterialCalendarView.showOtherMonths;
@@ -37,6 +41,7 @@ abstract class CalendarPagerView extends ViewGroup
   private CalendarDay minDate = null;
   private CalendarDay maxDate = null;
   protected boolean showWeekDays;
+  private int weekDaysHeight = 0;
 
   private final Collection<DayViewHolder> dayViews = new ArrayList<>();
 
@@ -51,6 +56,7 @@ abstract class CalendarPagerView extends ViewGroup
     this.firstViewDay = firstViewDay;
     this.firstDayOfWeek = firstDayOfWeek;
     this.showWeekDays = showWeekDays;
+    this.weekDaysHeight = mcv.getWeekDaysHeight();
 
     setClipChildren(false);
     setClipToPadding(false);
@@ -246,9 +252,18 @@ abstract class CalendarPagerView extends ViewGroup
       throw new IllegalStateException("CalendarPagerView should never be left to decide it's size");
     }
 
+    Log.v("CPV", String.format("getRows() = %s", getRows()));
+
+    int weekDaysViewHeight = (showWeekDays && weekDaysHeight > 0) ? weekDaysHeight : 0;
+
     //The spec width should be a correct multiple
     final int measureTileWidth = specWidthSize / DEFAULT_DAYS_IN_WEEK;
-    final int measureTileHeight = specHeightSize / getRows();
+    final int measureTileHeight = (specHeightSize - weekDaysViewHeight) /
+            (weekDaysViewHeight > 0 ? getRows() - 1 : getRows());
+
+    if (weekDaysViewHeight > 0) {
+      weekDaysViewHeight += specHeightSize - (weekDaysViewHeight + measureTileHeight * (getRows() - 1));
+    }
 
     //Just use the spec sizes
     setMeasuredDimension(specWidthSize, specHeightSize);
@@ -263,10 +278,9 @@ abstract class CalendarPagerView extends ViewGroup
           MeasureSpec.EXACTLY
       );
 
-      int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
-          measureTileHeight,
-          MeasureSpec.EXACTLY
-      );
+      int childHeightMeasureSpec = (weekDaysViewHeight > 0 && child instanceof WeekDayView) ?
+              MeasureSpec.makeMeasureSpec(weekDaysViewHeight, MeasureSpec.EXACTLY) :
+              MeasureSpec.makeMeasureSpec(measureTileHeight, MeasureSpec.EXACTLY);
 
       child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
     }
