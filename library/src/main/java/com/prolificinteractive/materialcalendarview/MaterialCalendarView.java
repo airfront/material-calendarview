@@ -12,6 +12,7 @@ import android.os.Parcelable;
 import android.support.annotation.ArrayRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -240,6 +241,9 @@ public class MaterialCalendarView extends ViewGroup {
   private DayOfWeek firstDayOfWeek;
   private boolean showWeekDays;
 
+  @LayoutRes
+  private int toolbarLayout = 0;
+
   private State state;
 
   public MaterialCalendarView(Context context) {
@@ -396,6 +400,9 @@ public class MaterialCalendarView extends ViewGroup {
           R.styleable.MaterialCalendarView_mcv_allowClickDaysOutsideCurrentMonth,
           true
       ));
+
+      toolbarLayout = a.getResourceId(R.styleable.MaterialCalendarView_mcv_toolbarLayout, 0);
+
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -421,6 +428,10 @@ public class MaterialCalendarView extends ViewGroup {
 
   private void setupChildren() {
     addView(topbar);
+
+    if (toolbarLayout != 0) {
+        addView(View.inflate(getContext(), toolbarLayout, null));
+    }
 
     pager.setId(R.id.mcv_pager);
     pager.setOffscreenPageLimit(1);

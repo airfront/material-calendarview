@@ -66,6 +66,8 @@
       <enum name="vertical" value="0"/>
       <enum name="horizontal" value="1"/>
     </attr>
+
+    <attr name="mcv_toolbarLayout" format="reference" />
   </declare-styleable>
 
 </resources>
