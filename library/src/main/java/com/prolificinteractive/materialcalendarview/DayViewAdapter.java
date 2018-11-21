@@ -6,9 +6,11 @@ import com.prolificinteractive.materialcalendarview.format.DayFormatter;
 
 public abstract class DayViewAdapter {
 
+    public MaterialCalendarView mcv = null;
+
     public static DayViewAdapter DEFAULT = new DayViewAdapter() {
         @Override
-        public DayViewHolder createDayView(Context context, CalendarDay calendarDay) {
+        public DayViewHolder onCreateViewHolder(Context context, CalendarDay calendarDay) {
             return new DayViewHolder(new DayView(context, calendarDay), calendarDay) {
                 @Override
                 protected void setTextAppearance(Context context, int textAppearance) {
@@ -46,10 +48,16 @@ public abstract class DayViewAdapter {
                 }
             };
         }
+
+        @Override
+        public void onBindViewHolder(DayViewHolder vh) {
+            // DO NOTHING
+        }
     };
 
     public DayViewAdapter() {
     }
 
-    public abstract DayViewHolder createDayView(Context context, CalendarDay calendarDay);
+    public abstract DayViewHolder onCreateViewHolder(Context context, CalendarDay calendarDay);
+    public abstract void onBindViewHolder(DayViewHolder vh);
 }

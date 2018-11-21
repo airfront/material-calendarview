@@ -2,6 +2,7 @@ package com.prolificinteractive.materialcalendarview.sample;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -40,6 +41,61 @@ public class BasicActivity extends AppCompatActivity
   @BindView(R.id.textView)
   TextView textView;
 
+  class CustomDayViewHolder extends DayViewHolder {
+    private final TextView label;
+    private final TextView event1, event2, event3;
+
+    public CustomDayViewHolder(Context context, CalendarDay date) {
+      super(View.inflate(context, R.layout.view_day, null), date);
+      label = itemView.findViewById(R.id.label);
+      event1 = itemView.findViewById(R.id.event1);
+      event2 = itemView.findViewById(R.id.event2);
+      event3 = itemView.findViewById(R.id.event3);
+    }
+
+    public void bind() {
+      label.setText(String.format(Locale.US, "%d", getDate().getDay()));
+      final long c = System.currentTimeMillis();
+      event1.setText(String.format(Locale.US, "%d", c % 100000 / 1000));
+    }
+
+    @Override
+    protected void setupSelection(int showOtherDates, boolean inRange, boolean inMonth) {
+      super.setupSelection(showOtherDates, inRange, inMonth);
+
+      boolean visible = inMonth && inRange;
+      itemView.setEnabled(inRange);
+
+      boolean showOtherMonths = showOtherMonths(showOtherDates);
+      boolean showOutOfRange = showOutOfRange(showOtherDates) || showOtherMonths;
+
+      if (!inMonth && showOtherMonths) {
+        visible = true;
+      }
+
+      if (!inRange && showOutOfRange) {
+        visible |= inMonth;
+      }
+
+      itemView.setAlpha(!inMonth && visible ? .4f : 1f);
+      itemView.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+    }
+  }
+
+  class CustomDayViewAdapter extends DayViewAdapter {
+    @Override
+    public DayViewHolder onCreateViewHolder(Context context, CalendarDay calendarDay) {
+      return new CustomDayViewHolder(context, calendarDay);
+    }
+
+    @Override
+    public void onBindViewHolder(DayViewHolder vh) {
+      ((CustomDayViewHolder) vh).bind();
+    }
+  }
+
+  private CustomDayViewAdapter adapter = new CustomDayViewAdapter();
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -51,45 +107,7 @@ public class BasicActivity extends AppCompatActivity
     widget.setOnMonthChangedListener(this);
 
     widget.setShowOtherDates(MaterialCalendarView.SHOW_ALL);
-    widget.setDayViewAdapter(new DayViewAdapter() {
-      @Override
-      public DayViewHolder createDayView(Context context, CalendarDay calendarDay) {
-        return new DayViewHolder(View.inflate(context, R.layout.view_day, null), calendarDay) {
-          private TextView label;
-          private TextView event1, event2, event3;
-          @Override
-          protected void onBind(View v, CalendarDay date) {
-            label = v.findViewById(R.id.label);
-            label.setText(String.format(Locale.US, "%d", calendarDay.getDay()));
-            event1 = v.findViewById(R.id.event1);
-            event2 = v.findViewById(R.id.event2);
-            event3 = v.findViewById(R.id.event3);
-          }
-
-          @Override
-          protected void setupSelection(int showOtherDates, boolean inRange, boolean inMonth) {
-            super.setupSelection(showOtherDates, inRange, inMonth);
-
-            boolean visible = inMonth && inRange;
-            itemView.setEnabled(inRange);
-
-            boolean showOtherMonths = showOtherMonths(showOtherDates);
-            boolean showOutOfRange = showOutOfRange(showOtherDates) || showOtherMonths;
-
-            if (!inMonth && showOtherMonths) {
-              visible = true;
-            }
-
-            if (!inRange && showOutOfRange) {
-              visible |= inMonth;
-            }
-
-            itemView.setAlpha(!inMonth && visible ? .4f : 1f);
-            itemView.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
-          }
-        };
-      }
-    });
+    widget.setDayViewAdapter(adapter);
 
     //Setup initial text
     textView.setText("No Selection");
@@ -113,5 +131,45 @@ public class BasicActivity extends AppCompatActivity
   public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
     //noinspection ConstantConditions
     getSupportActionBar().setTitle(FORMATTER.format(date.getDate()));
+  }
+
+  class UpdateTimer extends CountDownTimer {
+
+    public UpdateTimer(long t) {
+      super(t, t);
+      start();
+    }
+
+    @Override
+    public void onTick(long millisUntilFinished) {
+
+    }
+
+    @Override
+    public void onFinish() {
+      updateCalendar();
+      timer = new UpdateTimer(1000);
+    }
+  }
+
+  private UpdateTimer timer = null;
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    timer = new UpdateTimer(1000);
+  }
+
+  @Override
+  protected void onPause() {
+    if (timer != null) {
+      timer.cancel();
+      timer = null;
+    }
+    super.onPause();
+  }
+
+  void updateCalendar() {
+    widget.refreshDayViews();
   }
 }

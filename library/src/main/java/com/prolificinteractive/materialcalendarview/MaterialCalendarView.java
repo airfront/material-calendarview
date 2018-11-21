@@ -1471,30 +1471,28 @@ public class MaterialCalendarView extends ViewGroup {
   /**
    * Call by {@link CalendarPagerView} to indicate that a day was clicked and we should handle it
    */
-  protected void onDateClicked(final DayView dayView) {
+  protected void doOnDateClicked(final CalendarDay date, final boolean isChecked) {
     final CalendarDay currentDate = getCurrentDate();
-    final CalendarDay selectedDate = dayView.getDate();
     final int currentMonth = currentDate.getMonth();
-    final int selectedMonth = selectedDate.getMonth();
 
     if (calendarMode == CalendarMode.MONTHS
-        && allowClickDaysOutsideCurrentMonth
-        && currentMonth != selectedMonth) {
-      if (currentDate.isAfter(selectedDate)) {
+            && allowClickDaysOutsideCurrentMonth
+            && currentMonth != date.getMonth()) {
+      if (currentDate.isAfter(date)) {
         goToPrevious();
-      } else if (currentDate.isBefore(selectedDate)) {
+      } else if (currentDate.isBefore(date)) {
         goToNext();
       }
     }
-    onDateClicked(dayView.getDate(), !dayView.isChecked());
+    onDateClicked(date, !isChecked);
   }
 
   /**
    * Call by {@link CalendarPagerView} to indicate that a day was long clicked and we should handle it
    */
-  protected void onDateLongClicked(final DayView dayView) {
+  protected void doOnDateLongClicked(final CalendarDay date) {
     if (longClickListener != null) {
-      longClickListener.onDateLongClick(MaterialCalendarView.this, dayView.getDate());
+      longClickListener.onDateLongClick(MaterialCalendarView.this, date);
     }
   }
 
@@ -2024,7 +2022,13 @@ public class MaterialCalendarView extends ViewGroup {
   }
 
   public final void setDayViewAdapter(DayViewAdapter adapter) {
+    if (dayViewAdapter != null) {
+      dayViewAdapter.mcv = null;
+    }
     dayViewAdapter = adapter;
+    if (adapter != null) {
+      adapter.mcv = this;
+    }
   }
 
   @NonNull
@@ -2035,5 +2039,10 @@ public class MaterialCalendarView extends ViewGroup {
 
   public final int getWeekDaysHeight() {
     return weekDaysHeight;
+  }
+
+  public void refreshDayViews() {
+    if (adapter == null) return;
+    adapter.notifyDataSetChanged();
   }
 }

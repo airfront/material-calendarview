@@ -5,15 +5,18 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView.ShowOtherDates;
 import com.prolificinteractive.materialcalendarview.format.DayFormatter;
 import com.prolificinteractive.materialcalendarview.format.TitleFormatter;
 import com.prolificinteractive.materialcalendarview.format.WeekDayFormatter;
+
+import org.threeten.bp.LocalDate;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.threeten.bp.LocalDate;
 
 /**
  * Pager adapter backing the calendar view
@@ -374,5 +377,11 @@ abstract class CalendarPagerAdapter<V extends CalendarPagerView> extends PagerAd
 
   protected int getWeekDayTextAppearance() {
     return weekDayTextAppearance == null ? 0 : weekDayTextAppearance;
+  }
+
+  public void notifyDataSetChanged() {
+    for (V pagerView : currentViews) {
+      pagerView.notifyDataSetChanged();
+    }
   }
 }

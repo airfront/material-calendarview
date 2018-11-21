@@ -10,16 +10,13 @@ import com.prolificinteractive.materialcalendarview.format.DayFormatter;
 
 abstract public class DayViewHolder implements Checkable {
 
-    protected final View itemView;
-    protected final CalendarDay day;
+    public final View itemView;
+    public final CalendarDay day;
 
     public DayViewHolder(@NonNull View v, @NonNull CalendarDay calendarDay) {
         itemView = v;
         day = calendarDay;
-        onBind(v, calendarDay);
     }
-
-    protected void onBind(@NonNull View v, @NonNull CalendarDay date) {}
 
     protected void setTextAppearance(Context context, @StyleRes int textAppearance) {}
 

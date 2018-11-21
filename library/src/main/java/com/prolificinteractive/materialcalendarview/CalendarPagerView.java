@@ -43,7 +43,7 @@ abstract class CalendarPagerView extends ViewGroup
   protected boolean showWeekDays;
   private int weekDaysHeight = 0;
 
-  private final Collection<DayViewHolder> dayViews = new ArrayList<>();
+  final Collection<DayViewHolder> dayViews = new ArrayList<>();
 
   public CalendarPagerView(
       @NonNull MaterialCalendarView view,
@@ -82,8 +82,9 @@ abstract class CalendarPagerView extends ViewGroup
 
   protected void addDayView(Collection<DayViewHolder> dayViews, LocalDate temp) {
     CalendarDay day = CalendarDay.from(temp);
-    DayViewAdapter factory = mcv.getDayViewAdapter();
-    DayViewHolder dayViewHolder = factory.createDayView(getContext(), day);
+    DayViewAdapter adapter = mcv.getDayViewAdapter();
+    DayViewHolder dayViewHolder = adapter.onCreateViewHolder(getContext(), day);
+    adapter.onBindViewHolder(dayViewHolder);
     View dayView = dayViewHolder.itemView;
     dayView.setOnClickListener(this);
     dayView.setOnLongClickListener(this);
@@ -207,22 +208,27 @@ abstract class CalendarPagerView extends ViewGroup
     }
   }
 
+  private DayViewHolder getChildViewHolder(View v) {
+    for (DayViewHolder vh: dayViews) {
+      if (vh.itemView == v) return vh;
+    }
+    return null;
+  }
+
   @Override
   public void onClick(final View v) {
-    if (v instanceof DayView) {
-      final DayView dayView = (DayView) v;
-      mcv.onDateClicked(dayView);
+    final DayViewHolder vh = getChildViewHolder(v);
+    if (vh != null) {
+      mcv.doOnDateClicked(vh.day, vh.isChecked());
     }
   }
 
   @Override
   public boolean onLongClick(final View v) {
-    if (v instanceof DayView) {
-      final DayView dayView = (DayView) v;
-      mcv.onDateLongClicked(dayView);
-      return true;
-    }
-    return false;
+    final DayViewHolder vh = getChildViewHolder(v);
+    if (vh == null) return false;
+    mcv.doOnDateLongClicked(vh.day);
+    return true;
   }
 
   /*
@@ -380,6 +386,12 @@ abstract class CalendarPagerView extends ViewGroup
      */
     public LayoutParams() {
       super(WRAP_CONTENT, WRAP_CONTENT);
+    }
+  }
+
+  void notifyDataSetChanged() {
+    for (DayViewHolder vh: dayViews) {
+      mcv.getDayViewAdapter().onBindViewHolder(vh);
     }
   }
 }
