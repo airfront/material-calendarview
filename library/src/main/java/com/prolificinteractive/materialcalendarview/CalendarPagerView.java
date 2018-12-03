@@ -3,7 +3,6 @@ package com.prolificinteractive.materialcalendarview;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
@@ -257,8 +256,6 @@ abstract class CalendarPagerView extends ViewGroup
     if (specHeightMode == MeasureSpec.UNSPECIFIED || specWidthMode == MeasureSpec.UNSPECIFIED) {
       throw new IllegalStateException("CalendarPagerView should never be left to decide it's size");
     }
-
-    Log.v("CPV", String.format("getRows() = %s", getRows()));
 
     int weekDaysViewHeight = (showWeekDays && weekDaysHeight > 0) ? weekDaysHeight : 0;
 
